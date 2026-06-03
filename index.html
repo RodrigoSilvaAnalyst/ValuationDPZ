@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domino's Pizza (DPZ) — Valuation | Análise Fundamental</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --dpz-red:#E31837;--dpz-blue:#1196DB;--dpz-blue-deep:#006491;--dpz-dark:#0B0F14;
+    --dpz-panel:#121821;--dpz-panel-2:#1A222C;--dpz-border:#28333F;
+    --dpz-text:#EAF1F6;--dpz-muted:#8FA0AE;--dpz-green:#27C28A;--dpz-orange:#FF8A00;--dpz-purple:#A855F7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;background:radial-gradient(ellipse at top,#0F1722 0%,var(--dpz-dark) 60%);color:var(--dpz-text);line-height:1.55;overflow-x:hidden;min-height:100vh}
+  body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle at 20% 20%,rgba(39,194,138,0.07),transparent 40%),radial-gradient(circle at 80% 70%,rgba(17,150,219,0.08),transparent 40%);pointer-events:none;z-index:0;animation:bgDrift 20s ease-in-out infinite alternate}
+  @keyframes bgDrift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(-3%,2%) scale(1.05)}}
+  .container{max-width:1280px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+  .analyst-badges{position:fixed;top:18px;right:18px;z-index:1000;display:flex;align-items:center;gap:10px}
+  .analyst-badge{display:flex;align-items:center;gap:10px;background:rgba(11,15,20,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--dpz-border);padding:7px 14px 7px 7px;border-radius:999px;text-decoration:none;color:var(--dpz-text);transition:all 0.3s ease;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
+  .analyst-badge:hover{border-color:var(--dpz-blue);transform:translateY(-2px);box-shadow:0 8px 28px rgba(17,150,219,0.25)}
+  .analyst-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--dpz-blue),var(--dpz-red));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:0.82rem;letter-spacing:-0.02em}
+  .analyst-info{font-size:0.78rem;line-height:1.25}
+  .analyst-label{color:var(--dpz-muted);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:600}
+  .analyst-name{color:var(--dpz-text);font-weight:700;font-size:0.85rem}
+  .linkedin-icon{width:16px;height:16px;color:var(--dpz-blue);margin-left:2px;flex-shrink:0}
+  @media(max-width:600px){.analyst-badges{top:12px;right:12px;gap:8px}.analyst-badge{padding:6px 10px 6px 6px}.analyst-info{display:none}}
+
+  .hero{min-height:88vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:80px 24px 60px;position:relative}
+  .val-icon-wrap{position:relative;width:170px;height:170px;margin-bottom:24px;display:flex;align-items:center;justify-content:center}
+  .val-icon-wrap::before{content:'';position:absolute;inset:-12px;border-radius:50%;background:conic-gradient(from 0deg,var(--dpz-green),var(--dpz-blue),var(--dpz-red),var(--dpz-green));filter:blur(22px);opacity:0.35;animation:spin 14s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .val-icon{width:110px;height:110px;border-radius:26px;background:linear-gradient(135deg,var(--dpz-blue),var(--dpz-red));display:flex;align-items:center;justify-content:center;font-size:3.4rem;font-weight:900;color:#fff;position:relative;z-index:1;box-shadow:0 0 40px rgba(17,150,219,0.4);animation:float 4s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .hero h1{font-size:clamp(2rem,5vw,4.2rem);font-weight:900;letter-spacing:-0.02em;background:linear-gradient(135deg,var(--dpz-blue) 0%,#7FD0F5 45%,var(--dpz-red) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px;opacity:0;transform:translateY(20px);animation:fadeUp 0.9s ease-out 0.2s forwards}
+  .hero .ticker{display:inline-flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center;background:rgba(17,150,219,0.1);border:1px solid rgba(17,150,219,0.3);padding:8px 20px;border-radius:999px;font-weight:600;color:#7FD0F5;margin-bottom:24px;opacity:0;transform:translateY(20px);animation:fadeUp 0.9s ease-out 0.4s forwards}
+  .hero .subtitle{color:var(--dpz-muted);max-width:820px;font-size:1.1rem;opacity:0;transform:translateY(20px);animation:fadeUp 0.9s ease-out 0.6s forwards}
+  .hero-badge{display:inline-block;padding:4px 12px;border-radius:6px;background:var(--dpz-red);color:white;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:18px;opacity:0;animation:fadeUp 0.9s ease-out forwards}
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+  .scroll-indicator{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);color:var(--dpz-muted);font-size:0.85rem;animation:bounce 2s infinite}
+  @keyframes bounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+
+  section{padding:80px 0;position:relative}
+  .section-tag{display:inline-block;padding:6px 14px;border-radius:999px;background:rgba(227,24,55,0.15);color:#FF6B81;font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px}
+  .section-title{font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:14px}
+  .section-title .accent{color:var(--dpz-blue)}
+  .section-sub{color:var(--dpz-muted);max-width:840px;margin-bottom:48px;font-size:1.05rem}
+
+  .snap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}
+  .snap-card{background:linear-gradient(135deg,var(--dpz-panel) 0%,var(--dpz-panel-2) 100%);border:1px solid var(--dpz-border);padding:22px;border-radius:14px;transition:all 0.3s ease;position:relative;overflow:hidden}
+  .snap-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--sn-color,var(--dpz-blue));transform:scaleX(0);transform-origin:left;transition:transform 0.5s ease}
+  .snap-card:hover{transform:translateY(-4px);border-color:var(--sn-color,var(--dpz-blue))}
+  .snap-card:hover::before{transform:scaleX(1)}
+  .snap-card .l{font-size:0.74rem;color:var(--dpz-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px}
+  .snap-card .v{font-size:1.7rem;font-weight:900;color:var(--sn-color,var(--dpz-blue));line-height:1.1}
+  .snap-card .s{font-size:0.78rem;color:var(--dpz-muted);margin-top:6px}
+
+  .table-wrap{background:var(--dpz-panel);border:1px solid var(--dpz-border);border-radius:18px;overflow:hidden;overflow-x:auto}
+  table.pro{width:100%;border-collapse:collapse;min-width:680px}
+  table.pro th{background:var(--dpz-panel-2);padding:16px 18px;text-align:left;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--dpz-muted);font-weight:700;border-bottom:2px solid var(--dpz-border)}
+  table.pro td{padding:15px 18px;border-bottom:1px solid var(--dpz-border);font-size:0.92rem}
+  table.pro tr:last-child td{border-bottom:none}
+  table.pro tr:hover td{background:rgba(17,150,219,0.04)}
+  table.pro .metric-name{font-weight:700;color:var(--dpz-text)}
+  table.pro .metric-sub{font-size:0.76rem;color:var(--dpz-muted);margin-top:2px}
+  table.pro .val-cell{font-weight:800;color:var(--dpz-blue);font-family:'SF Mono',ui-monospace,monospace}
+  .verdict-tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em}
+  .vt-cheap{background:rgba(39,194,138,0.18);color:var(--dpz-green)}
+  .vt-fair{background:rgba(17,150,219,0.18);color:var(--dpz-blue)}
+  .vt-rich{background:rgba(227,24,55,0.18);color:#FF8A7C}
+  .dpz-row td{background:rgba(17,150,219,0.07)!important}
+
+  .chart-container{background:var(--dpz-panel);border:1px solid var(--dpz-border);padding:28px;border-radius:18px;display:flex;flex-direction:column}
+  .chart-canvas-box{position:relative;width:100%}
+
+  .dcf-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:900px){.dcf-layout{grid-template-columns:1fr}}
+  .assump-card{background:var(--dpz-panel);border:1px solid var(--dpz-border);border-radius:16px;padding:26px}
+  .assump-card h3{font-size:1.05rem;color:var(--dpz-blue);margin-bottom:16px}
+  .assump-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px dashed var(--dpz-border);font-size:0.9rem}
+  .assump-row:last-child{border-bottom:none}
+  .assump-row .ar-l{color:var(--dpz-muted)}
+  .assump-row .ar-v{font-weight:800;color:var(--dpz-text);font-family:ui-monospace,monospace}
+
+  .scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
+  @media(max-width:680px){.scenario-grid{grid-template-columns:1fr}}
+  .scenario-card{border-radius:14px;padding:22px;text-align:center;border:1px solid var(--dpz-border);transition:transform 0.3s ease}
+  .scenario-card:hover{transform:translateY(-4px)}
+  .scenario-card.bear{background:linear-gradient(135deg,rgba(227,24,55,0.1),var(--dpz-panel));border-color:rgba(227,24,55,0.3)}
+  .scenario-card.base{background:linear-gradient(135deg,rgba(17,150,219,0.1),var(--dpz-panel));border-color:rgba(17,150,219,0.3)}
+  .scenario-card.bull{background:linear-gradient(135deg,rgba(39,194,138,0.1),var(--dpz-panel));border-color:rgba(39,194,138,0.3)}
+  .scenario-card .sc-name{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:10px}
+  .scenario-card.bear .sc-name{color:#FF8A7C}
+  .scenario-card.base .sc-name{color:var(--dpz-blue)}
+  .scenario-card.bull .sc-name{color:var(--dpz-green)}
+  .scenario-card .sc-val{font-size:2.1rem;font-weight:900;line-height:1;margin-bottom:8px;color:var(--dpz-text)}
+  .scenario-card .sc-delta{font-size:0.82rem;font-weight:700}
+  .scenario-card .sc-assump{font-size:0.72rem;color:var(--dpz-muted);margin-top:10px;line-height:1.5}
+
+  .sens-wrap{background:var(--dpz-panel);border:1px solid var(--dpz-border);border-radius:18px;padding:26px;overflow-x:auto}
+  .sens-table{width:100%;border-collapse:collapse;min-width:620px;text-align:center}
+  .sens-table th{padding:12px;font-size:0.78rem;color:var(--dpz-muted);font-weight:700}
+  .sens-table td{padding:14px 12px;font-weight:800;font-size:0.92rem;border-radius:6px;font-family:ui-monospace,monospace}
+  .sens-table .corner{color:var(--dpz-blue);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em}
+  .sens-table .axis-label{color:var(--dpz-muted);font-weight:700;font-size:0.82rem}
+
+  .mc-layout{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:stretch}
+  @media(max-width:1000px){.mc-layout{grid-template-columns:1fr}}
+  .mc-stats{display:flex;flex-direction:column;gap:12px}
+  .mc-stat-card{background:linear-gradient(135deg,var(--dpz-panel),var(--dpz-panel-2));border:1px solid var(--dpz-border);border-radius:14px;padding:18px 20px;display:flex;justify-content:space-between;align-items:center}
+  .mc-stat-card .mc-l{font-size:0.8rem;color:var(--dpz-muted)}
+  .mc-stat-card .mc-v{font-size:1.5rem;font-weight:900;color:var(--dpz-blue);font-family:ui-monospace,monospace}
+  .mc-stat-card.highlight{background:linear-gradient(135deg,rgba(39,194,138,0.12),var(--dpz-panel));border-color:rgba(39,194,138,0.3)}
+  .mc-stat-card.highlight .mc-v{color:var(--dpz-green)}
+  .mc-note{font-size:0.82rem;color:var(--dpz-muted);margin-top:12px;line-height:1.55;padding:14px;background:rgba(17,150,219,0.06);border-left:3px solid var(--dpz-blue);border-radius:0 8px 8px 0}
+
+  .ff-container{background:var(--dpz-panel);border:1px solid var(--dpz-border);padding:28px;border-radius:18px}
+  .ff-canvas-box{position:relative;height:420px;width:100%}
+
+  .verdict-banner{background:linear-gradient(135deg,rgba(227,24,55,0.15),rgba(17,150,219,0.1));border:1px solid rgba(17,150,219,0.3);border-radius:20px;padding:36px;text-align:center}
+  .verdict-banner h3{font-size:clamp(1.4rem,2.6vw,2rem);margin-bottom:12px;background:linear-gradient(135deg,var(--dpz-blue),var(--dpz-red));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .verdict-banner p{color:var(--dpz-text);font-size:1.05rem;max-width:880px;margin:0 auto}
+  .verdict-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-top:24px}
+  .verdict-card{background:rgba(0,0,0,0.3);border-radius:12px;padding:18px;border:1px solid var(--dpz-border)}
+  .verdict-card .l{font-size:0.7rem;color:var(--dpz-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+  .verdict-card .v{font-size:1.25rem;font-weight:800;color:var(--dpz-blue)}
+
+  footer{margin-top:60px;padding:40px 0;border-top:1px solid var(--dpz-border);text-align:center;color:var(--dpz-muted);font-size:0.85rem}
+  footer a{color:var(--dpz-blue);text-decoration:none}
+  footer a:hover{text-decoration:underline}
+  .disclaimer{max-width:900px;margin:14px auto 0;font-size:0.78rem;color:#5C6B77;line-height:1.6}
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity 0.8s ease,transform 0.8s ease}
+  .reveal.visible{opacity:1;transform:translateY(0)}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+  .pulse{animation:pulse 2.5s ease-in-out infinite}
+</style>
+</head>
+<body>
+
+<div class="analyst-badges">
+  <a class="analyst-badge" href="https://www.linkedin.com/in/rodrigo-silva-92a402334/" target="_blank" rel="noopener">
+    <div class="analyst-avatar">RS</div>
+    <div class="analyst-info"><div class="analyst-label">Analista</div><div class="analyst-name">Rodrigo Silva</div></div>
+    <svg class="linkedin-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68 1.69 1.69 0 0 0-1.68-1.69 1.69 1.69 0 0 0-1.69 1.69 1.68 1.68 0 0 0 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+  </a>
+  <a class="analyst-badge" href="https://www.linkedin.com/company/asclub/?viewAsMember=true" target="_blank" rel="noopener">
+    <div class="analyst-avatar">AS</div>
+    <div class="analyst-info"><div class="analyst-label">Comunidade</div><div class="analyst-name">ASCLUB</div></div>
+    <svg class="linkedin-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68 1.69 1.69 0 0 0-1.68-1.69 1.69 1.69 0 0 0-1.69 1.69 1.68 1.68 0 0 0 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+  </a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <span class="hero-badge pulse">Análise Fundamental · NYSE: DPZ · Valuation</span>
+  <div class="val-icon-wrap"><div class="val-icon">$</div></div>
+  <h1>Valuation<br>Domino's Pizza, Inc.</h1>
+  <span class="ticker">
+    <span style="width:8px;height:8px;border-radius:50%;background:var(--dpz-green);box-shadow:0 0 8px var(--dpz-green)"></span>
+    Preço ~$316 · Market Cap ~$10.8B · P/E ~18x · dados de finais de maio de 2026
+  </span>
+  <p class="subtitle">Valuation triangulado por quatro metodologias independentes: múltiplos face ao histórico da própria empresa, comparação com peers, modelo DCF com três cenários e simulação Monte Carlo de 10.000 iterações. A tese de partida é simples: um líder de mercado com ROIC de classe mundial transaciona a cerca de 18x lucros, muito abaixo da sua média de cinco anos. O mercado de-ratou um compounder de qualidade.</p>
+  <div class="scroll-indicator">↓ Scroll</div>
+</section>
+
+<!-- 1. SNAPSHOT -->
+<section>
+  <div class="container">
+    <span class="section-tag">01 · Snapshot de Mercado</span>
+    <h2 class="section-title">Onde está o <span class="accent">preço</span> hoje</h2>
+    <p class="section-sub">Fotografia da cotação em finais de maio de 2026. A ação transaciona cerca de 36% abaixo do máximo de 52 semanas ($496) e bem abaixo do máximo histórico de 2021 (perto de 567 dólares), o que comprimiu múltiplos e melhorou o ponto de entrada num negócio cuja qualidade pouco mudou.</p>
+
+    <div class="snap-grid">
+      <div class="snap-card reveal" style="--sn-color:var(--dpz-blue)"><div class="l">Preço atual</div><div class="v">~$316</div><div class="s">52 sem.: $297 – $496</div></div>
+      <div class="snap-card reveal" style="--sn-color:var(--dpz-purple)"><div class="l">Market Cap</div><div class="v">~$10.8B</div><div class="s">~34.2M ações</div></div>
+      <div class="snap-card reveal" style="--sn-color:var(--dpz-orange)"><div class="l">Enterprise Value</div><div class="v">~$15.5B</div><div class="s">Inclui ~$4.7B net debt</div></div>
+      <div class="snap-card reveal" style="--sn-color:var(--dpz-green)"><div class="l">Dividend Yield</div><div class="v">~2.5%</div><div class="s">$7.96 / ação · grower</div></div>
+      <div class="snap-card reveal" style="--sn-color:var(--dpz-blue)"><div class="l">Posição vs máx. 52 sem.</div><div class="v">−36%</div><div class="s">ATH 2021 ~$567 · −44%</div></div>
+      <div class="snap-card reveal" style="--sn-color:var(--dpz-green)"><div class="l">FCF Yield</div><div class="v">~6.2%</div><div class="s">$671.5M FCF / Market Cap</div></div>
+      <div class="snap-card reveal" style="--sn-color:var(--dpz-blue)"><div class="l">Earnings Yield</div><div class="v">~5.6%</div><div class="s">Inverso do P/E TTM</div></div>
+      <div class="snap-card reveal" style="--sn-color:var(--dpz-purple)"><div class="l">Morningstar FVE</div><div class="v">$415</div><div class="s">Wide Moat · ~+31% vs preço</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. MULTIPLES -->
+<section>
+  <div class="container">
+    <span class="section-tag">02 · Múltiplos de Valuation</span>
+    <h2 class="section-title">Múltiplos vs <span class="accent">o próprio histórico</span></h2>
+    <p class="section-sub">Cada múltiplo é confrontado com a média de cinco anos da própria Domino's. A leitura é inequívoca: a ação negoceia com desconto material face ao seu histórico em praticamente todas as métricas. Durante anos transacionou a 28-32x lucros; hoje está perto de 18x.</p>
+
+    <div class="table-wrap reveal">
+      <table class="pro">
+        <thead><tr><th>Métrica</th><th>Valor atual</th><th>Média 5 anos DPZ</th><th>Leitura</th></tr></thead>
+        <tbody>
+          <tr><td><div class="metric-name">P/E (TTM)</div><div class="metric-sub">Preço / EPS $17.57</div></td><td class="val-cell">~18.0x</td><td>~28x</td><td><span class="verdict-tag vt-cheap">Desconto</span></td></tr>
+          <tr><td><div class="metric-name">P/E Forward 2026E</div><div class="metric-sub">Preço / EPS est. ~$19.1</div></td><td class="val-cell">~16.5x</td><td>~26x</td><td><span class="verdict-tag vt-cheap">Desconto</span></td></tr>
+          <tr><td><div class="metric-name">P/E Forward 2027E</div><div class="metric-sub">Preço / EPS est. ~$21</div></td><td class="val-cell">~15.0x</td><td>~25x</td><td><span class="verdict-tag vt-cheap">Desconto</span></td></tr>
+          <tr><td><div class="metric-name">EV / EBITDA (TTM)</div><div class="metric-sub">EV ~$15.5B / EBITDA ~$1.05B</div></td><td class="val-cell">~14.8x</td><td>~20x</td><td><span class="verdict-tag vt-cheap">Desconto</span></td></tr>
+          <tr><td><div class="metric-name">P / FCF</div><div class="metric-sub">Market Cap / FCF $671.5M</div></td><td class="val-cell">~16.1x</td><td>~25x</td><td><span class="verdict-tag vt-cheap">Desconto</span></td></tr>
+          <tr><td><div class="metric-name">PEG (Forward)</div><div class="metric-sub">P/E 16.5x / cresc. EPS ~9%</div></td><td class="val-cell">~1.8x</td><td>~2.5x</td><td><span class="verdict-tag vt-cheap">Atrativo</span></td></tr>
+          <tr><td><div class="metric-name">Dividend Yield</div><div class="metric-sub">$7.96 / preço</div></td><td class="val-cell">~2.5%</td><td>~1.1%</td><td><span class="verdict-tag vt-cheap">Acima média</span></td></tr>
+          <tr><td><div class="metric-name">FCF Yield</div><div class="metric-sub">FCF / Market Cap</div></td><td class="val-cell">~6.2%</td><td>~4.0%</td><td><span class="verdict-tag vt-cheap">Acima média</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 3. PEERS -->
+<section>
+  <div class="container">
+    <span class="section-tag">03 · Comparação com Peers</span>
+    <h2 class="section-title">DPZ vs <span class="accent">restaurant peers</span></h2>
+    <p class="section-sub">Comparação dos múltiplos contra os principais comparáveis cotados. A Domino's, com o melhor ROIC do grupo e liderança de mercado, é a mais barata em P/E forward, a menos de metade do múltiplo da Wingstop e abaixo da Yum!, da McDonald's e da Restaurant Brands. O contraste sustenta a tese de desconto relativo.</p>
+
+    <div class="chart-container reveal" style="margin-bottom:24px">
+      <div class="chart-canvas-box" style="height:360px"><canvas id="peersChart"></canvas></div>
+    </div>
+
+    <div class="table-wrap reveal">
+      <table class="pro">
+        <thead><tr><th>Empresa</th><th>P/E Fwd</th><th>EV/EBITDA</th><th>Div Yield</th><th>ROIC</th><th>Rating</th></tr></thead>
+        <tbody>
+          <tr class="dpz-row">
+            <td><div class="metric-name">DPZ · Domino's</div><div class="metric-sub">Líder pizza · ~99% franchised</div></td>
+            <td class="val-cell">16.5x</td><td class="val-cell">~14.8x</td><td class="val-cell">~2.5%</td><td class="val-cell">~40%</td>
+            <td><span class="verdict-tag vt-cheap">Buy</span></td>
+          </tr>
+          <tr><td><div class="metric-name">PZZA · Papa John's</div><div class="metric-sub">Pizza · lucros deprimidos</div></td><td>~26x</td><td>~12x</td><td>~2.8%</td><td>~12%</td><td><span class="verdict-tag vt-fair">Hold</span></td></tr>
+          <tr><td><div class="metric-name">YUM · Yum! Brands</div><div class="metric-sub">Pizza Hut, KFC, Taco Bell</div></td><td>~21x</td><td>~17x</td><td>~2.0%</td><td>~22%</td><td><span class="verdict-tag vt-fair">Hold</span></td></tr>
+          <tr><td><div class="metric-name">WING · Wingstop</div><div class="metric-sub">Chicken · growth premium</div></td><td>~34x</td><td>~37x</td><td>~0.5%</td><td>~30%</td><td><span class="verdict-tag vt-rich">Caro</span></td></tr>
+          <tr><td><div class="metric-name">MCD · McDonald's</div><div class="metric-sub">Burger · wide moat</div></td><td>~21x</td><td>~16x</td><td>~2.4%</td><td>~17%</td><td><span class="verdict-tag vt-fair">Buy</span></td></tr>
+          <tr><td><div class="metric-name">QSR · Restaurant Brands</div><div class="metric-sub">Burger King, Tim Hortons</div></td><td>~18x</td><td>~14x</td><td>~3.4%</td><td>~13%</td><td><span class="verdict-tag vt-cheap">Buy</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 4. DCF -->
+<section>
+  <div class="container">
+    <span class="section-tag">04 · Modelo DCF</span>
+    <h2 class="section-title">Discounted Cash Flow · <span class="accent">3 cenários</span></h2>
+    <p class="section-sub">DCF a 10 anos sobre o Free Cash Flow, com terminal value por Gordon Growth. Pressupostos ancorados na própria orientação da empresa: crescimento de income from operations de 8% ao ano até 2028. O WACC de 8% reflete a alavancagem superior e um beta acima de 1, mais alto do que o de uma mega-cap defensiva. Ainda assim, o caso base aponta valor bem acima do preço.</p>
+
+    <div class="dcf-layout">
+      <div class="assump-card reveal">
+        <h3>Pressupostos do caso base</h3>
+        <div class="assump-row"><span class="ar-l">FCF inicial (FY25)</span><span class="ar-v">$0.67B</span></div>
+        <div class="assump-row"><span class="ar-l">Ações em circulação</span><span class="ar-v">34.2M</span></div>
+        <div class="assump-row"><span class="ar-l">Net debt</span><span class="ar-v">$4.71B</span></div>
+        <div class="assump-row"><span class="ar-l">Crescimento FCF anos 1-5</span><span class="ar-v">8.0%</span></div>
+        <div class="assump-row"><span class="ar-l">Crescimento FCF anos 6-10</span><span class="ar-v">5.0%</span></div>
+        <div class="assump-row"><span class="ar-l">Crescimento terminal (g)</span><span class="ar-v">3.0%</span></div>
+        <div class="assump-row"><span class="ar-l">WACC (base)</span><span class="ar-v">8.0%</span></div>
+        <div class="assump-row"><span class="ar-l">Horizonte explícito</span><span class="ar-v">10 anos</span></div>
+      </div>
+
+      <div class="chart-container reveal">
+        <div class="chart-canvas-box" style="height:340px"><canvas id="dcfChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="scenario-grid">
+      <div class="scenario-card bear reveal">
+        <div class="sc-name">▼ Bear</div>
+        <div class="sc-val">$248</div>
+        <div class="sc-delta" style="color:#FF8A7C">−22% vs preço</div>
+        <div class="sc-assump">WACC 8.75% · cresc. 5.5% · g 2.5%</div>
+      </div>
+      <div class="scenario-card base reveal">
+        <div class="sc-name">● Base</div>
+        <div class="sc-val">$403</div>
+        <div class="sc-delta" style="color:var(--dpz-blue)">+28% vs preço</div>
+        <div class="sc-assump">WACC 8.0% · cresc. 8% · g 3.0%</div>
+      </div>
+      <div class="scenario-card bull reveal">
+        <div class="sc-name">▲ Bull</div>
+        <div class="sc-val">$543</div>
+        <div class="sc-delta" style="color:var(--dpz-green)">+72% vs preço</div>
+        <div class="sc-assump">WACC 7.5% · cresc. 9% · g 3.25%</div>
+      </div>
+    </div>
+
+    <div class="reveal" style="margin-top:30px;background:linear-gradient(135deg,rgba(39,194,138,0.08),var(--dpz-panel));border:1px solid rgba(39,194,138,0.3);border-left:4px solid var(--dpz-green);border-radius:14px;padding:24px">
+      <h3 style="color:var(--dpz-green);font-size:1.1rem;margin-bottom:8px">Porque o caso base aponta upside</h3>
+      <p style="color:var(--dpz-muted);font-size:0.92rem;margin-bottom:16px">Mesmo com um WACC conservador para a alavancagem, três fatores empurram o valor acima do preço atual:</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+        <div style="background:rgba(0,0,0,0.25);border-radius:10px;padding:16px"><div style="color:var(--dpz-blue);font-weight:800;margin-bottom:5px">🚀 Crescimento de unidades</div><div style="font-size:0.85rem;color:var(--dpz-muted);line-height:1.5">Meta de mais de 1.100 aberturas líquidas por ano até 2028, financiadas pelos franqueados. Cada loja adiciona royalties e volume de supply chain quase sem capex da casa-mãe.</div></div>
+        <div style="background:rgba(0,0,0,0.25);border-radius:10px;padding:16px"><div style="color:var(--dpz-blue);font-weight:800;margin-bottom:5px">🔁 Recompras</div><div style="font-size:0.85rem;color:var(--dpz-muted);line-height:1.5">A redução persistente da contagem de ações amplifica o crescimento do EPS para lá do crescimento do lucro, um motor que o DCF de FCF total não capta totalmente.</div></div>
+        <div style="background:rgba(0,0,0,0.25);border-radius:10px;padding:16px"><div style="color:var(--dpz-blue);font-weight:800;margin-bottom:5px">📉 De-rating</div><div style="font-size:0.85rem;color:var(--dpz-muted);line-height:1.5">A 18x lucros contra uma média histórica de 28x, há margem para re-rating se o crescimento de unidades e a transição dos agregadores estabilizarem.</div></div>
+      </div>
+    </div>
+
+    <h3 style="margin:50px 0 18px;font-size:1.3rem;color:var(--dpz-blue)">Tabela de sensibilidade — WACC × Crescimento terminal (valor/ação)</h3>
+    <div class="sens-wrap reveal">
+      <table class="sens-table">
+        <thead><tr><th class="corner">WACC ↓ / g →</th><th class="axis-label">2.5%</th><th class="axis-label">3.0%</th><th class="axis-label">3.5%</th><th class="axis-label">4.0%</th></tr></thead>
+        <tbody id="sensBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 5. MONTE CARLO -->
+<section>
+  <div class="container">
+    <span class="section-tag">05 · Simulação Monte Carlo</span>
+    <h2 class="section-title">10.000 iterações <span class="accent">probabilísticas</span></h2>
+    <p class="section-sub">Em vez de valores fixos, cada input do DCF é tratado como uma distribuição normal. Foram simulados 10.000 cenários, gerando uma distribuição de valor intrínseco. Resultados calculados em tempo real no carregamento da página.</p>
+
+    <div class="mc-layout">
+      <div class="chart-container reveal">
+        <div class="chart-canvas-box" style="height:400px"><canvas id="mcChart"></canvas></div>
+        <div class="mc-note">
+          <strong>Variáveis aleatórias (distribuição normal):</strong> FCF inicial μ=$0.672B σ=$0.04B · Crescimento anos 1-5 μ=8% σ=1.5% · Crescimento anos 6-10 μ=5% σ=1.2% · Crescimento terminal μ=3% σ=0.4% · WACC μ=8% σ=0.5%.
+        </div>
+      </div>
+
+      <div class="mc-stats">
+        <div class="mc-stat-card reveal"><span class="mc-l">Valor médio</span><span class="mc-v" id="mcMean">—</span></div>
+        <div class="mc-stat-card reveal"><span class="mc-l">Mediana (P50)</span><span class="mc-v" id="mcMedian">—</span></div>
+        <div class="mc-stat-card reveal"><span class="mc-l">Percentil 10 (P10)</span><span class="mc-v" id="mcP10">—</span></div>
+        <div class="mc-stat-card reveal"><span class="mc-l">Percentil 90 (P90)</span><span class="mc-v" id="mcP90">—</span></div>
+        <div class="mc-stat-card reveal"><span class="mc-l">Desvio-padrão</span><span class="mc-v" id="mcStd">—</span></div>
+        <div class="mc-stat-card highlight reveal"><span class="mc-l">P(valor &gt; preço $316)</span><span class="mc-v" id="mcProb">—</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. FOOTBALL FIELD -->
+<section>
+  <div class="container">
+    <span class="section-tag">06 · Triangulação</span>
+    <h2 class="section-title">Football Field — <span class="accent">síntese</span> de métodos</h2>
+    <p class="section-sub">Cada metodologia gera um intervalo de valor justo. A barra vertical marca o preço atual (~$316). A leitura conjunta aponta um valor justo central em torno de $400 a $460, com o preço atual claramente abaixo. O downside parece limitado e o upside assimétrico.</p>
+
+    <div class="ff-container reveal">
+      <div class="ff-canvas-box"><canvas id="ffChart"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. VERDICT -->
+<section>
+  <div class="container">
+    <div class="verdict-banner reveal">
+      <h3>Veredicto de Valuation</h3>
+      <p>A Domino's é o líder da sua categoria, com o melhor ROIC do grupo e um histórico de criação de valor por ação difícil de igualar, e transaciona a cerca de 18x lucros, contra uma média histórica próxima de 28x. O <strong>caso base do DCF aponta para perto de $400</strong>, cerca de 28% acima do preço, e mesmo um cenário conservador limita o downside a cerca de 22%. A simulação Monte Carlo coloca a probabilidade de o valor intrínseco superar o preço bem acima de 50%. A <strong>Morningstar</strong>, que classifica a Domino's com Wide Moat, atribui um Fair Value de $415, praticamente em linha com o caso base. A acumulação da <strong>Berkshire Hathaway</strong> desde 2024 reforça a leitura de qualidade a desconto. O principal risco é o tempo: o re-rating depende de o mercado voltar a confiar no crescimento de unidades e na transição para os agregadores. O perfil risco/retorno é favorável: <strong>negócio de qualidade, múltiplo de mínimos plurianuais e upside assimétrico</strong>.</p>
+      <div class="verdict-cards">
+        <div class="verdict-card"><div class="l">Valor justo central</div><div class="v">$400–$460</div></div>
+        <div class="verdict-card"><div class="l">Preço atual</div><div class="v">~$316</div></div>
+        <div class="verdict-card"><div class="l">Margem de segurança</div><div class="v">Razoável</div></div>
+        <div class="verdict-card"><div class="l">Recomendação</div><div class="v">Atrativo</div></div>
+        <div class="verdict-card"><div class="l">Convicção</div><div class="v">Alta</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Valuation · Domino's Pizza, Inc. (NYSE: DPZ) · dados de finais de maio de 2026</p>
+    <p style="margin-top:8px">Fontes: <a href="https://stockanalysis.com/stocks/dpz/" target="_blank">Stock Analysis</a> · <a href="https://ir.dominos.com/news-releases/news-release-details/dominos-pizzar-announces-fourth-quarter-and-fiscal-2025" target="_blank">DPZ FY 2025 Results</a> · <a href="https://www.gurufocus.com/term/roic/DPZ" target="_blank">GuruFocus ROIC</a> · <a href="https://www.macrotrends.net/stocks/charts/DPZ/dominos-pizza-inc/pe-ratio" target="_blank">Macrotrends P/E</a> · <a href="https://finance.yahoo.com/quote/DPZ/" target="_blank">Yahoo Finance</a></p>
+    <p class="disclaimer">Documento de apoio à análise fundamental, elaborado com fins educativos e informativos. Não constitui recomendação de investimento, aconselhamento financeiro nem oferta de compra ou venda de valores mobiliários. Os modelos DCF e Monte Carlo assentam em pressupostos do analista e são sensíveis a alterações desses pressupostos. O valor de consenso é indicativo. Rentabilidades passadas não garantem resultados futuros.</p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  },{threshold:0.12});
+  document.querySelectorAll('.reveal,.snap-card,.scenario-card,.mc-stat-card').forEach(el => { el.classList.add('reveal'); observer.observe(el); });
+
+  Chart.defaults.color = '#8FA0AE';
+  Chart.defaults.font.family = "'Inter','Segoe UI',sans-serif";
+
+  const PRICE = 316;
+  const SHARES = 0.0342;   // mil milhões de ações
+  const NET_DEBT = 4.71;   // mil milhões
+
+  function runDCF(fcf0, g1, g2, gT, wacc){
+    let fcf = fcf0, pv = 0; const flows = [];
+    for(let y=1; y<=10; y++){
+      const g = y <= 5 ? g1 : g2;
+      fcf = fcf * (1 + g);
+      pv += fcf / Math.pow(1 + wacc, y);
+      flows.push(fcf);
+    }
+    const tv = (flows[9] * (1 + gT)) / (wacc - gT);
+    const ev = pv + tv / Math.pow(1 + wacc, 10);
+    return (ev - NET_DEBT) / SHARES;
+  }
+
+  // Peers chart
+  new Chart(document.getElementById('peersChart'), {
+    type:'bar',
+    data:{
+      labels:['DPZ','QSR','MCD','YUM','PZZA','WING'],
+      datasets:[
+        {label:'P/E Forward (x)',data:[16.5,18,21,21,26,34],backgroundColor:'rgba(17,150,219,0.85)',borderColor:'#1196DB',borderWidth:2,borderRadius:8},
+        {label:'EV/EBITDA (x)',data:[14.8,14,16,17,12,37],backgroundColor:'rgba(227,24,55,0.7)',borderColor:'#E31837',borderWidth:2,borderRadius:8}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{padding:14,usePointStyle:true,pointStyle:'circle'}},
+        tooltip:{callbacks:{label:(c)=>c.dataset.label+': '+c.parsed.y.toFixed(1)+'x'}},
+        title:{display:true,text:'Múltiplos vs Peers (menor = mais barato)',color:'#EAF1F6',font:{size:14,weight:'600'},padding:{bottom:16}}
+      },
+      scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(255,255,255,0.06)'},ticks:{callback:(v)=>v+'x'}}},
+      animation:{duration:1400,easing:'easeOutQuart'}
+    }
+  });
+
+  // DCF scenario chart
+  new Chart(document.getElementById('dcfChart'), {
+    type:'bar',
+    data:{
+      labels:['Bear','Base','Bull','Preço atual','Morningstar FVE'],
+      datasets:[{
+        label:'Valor / ação ($)',
+        data:[248,403,543,316,415],
+        backgroundColor:['rgba(227,24,55,0.8)','rgba(17,150,219,0.85)','rgba(39,194,138,0.8)','rgba(143,160,174,0.6)','rgba(168,85,247,0.7)'],
+        borderColor:['#E31837','#1196DB','#27C28A','#8FA0AE','#A855F7'],borderWidth:2,borderRadius:8
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:(c)=>'$'+c.parsed.y.toFixed(0)}},
+        title:{display:true,text:'DCF — Cenários vs Preço vs Consenso',color:'#EAF1F6',font:{size:14,weight:'600'},padding:{bottom:16}}
+      },
+      scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(255,255,255,0.06)'},ticks:{callback:(v)=>'$'+v},beginAtZero:true}},
+      animation:{duration:1400,easing:'easeOutQuart'}
+    }
+  });
+
+  // Sensitivity table
+  (function(){
+    const waccs = [0.075,0.080,0.0875,0.090,0.095];
+    const gs = [0.025,0.030,0.035,0.040];
+    const tbody = document.getElementById('sensBody');
+    waccs.forEach(w => {
+      const tr = document.createElement('tr');
+      const th = document.createElement('td');
+      th.className = 'axis-label'; th.textContent = (w*100).toFixed(2) + '%';
+      tr.appendChild(th);
+      gs.forEach(g => {
+        const val = runDCF(0.672, 0.08, 0.05, g, w);
+        const td = document.createElement('td');
+        td.textContent = '$' + val.toFixed(0);
+        let bg, col;
+        if(val >= PRICE){ bg='rgba(39,194,138,0.22)'; col='#27C28A'; }
+        else if(val >= PRICE*0.85){ bg='rgba(17,150,219,0.20)'; col='#1196DB'; }
+        else if(val >= PRICE*0.7){ bg='rgba(255,138,0,0.18)'; col='#FF8A00'; }
+        else { bg='rgba(227,24,55,0.18)'; col='#FF8A7C'; }
+        td.style.background = bg; td.style.color = col;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  })();
+
+  // Monte Carlo
+  (function(){
+    function gaussian(mu, sigma){
+      let u=0, v=0;
+      while(u===0) u=Math.random();
+      while(v===0) v=Math.random();
+      return mu + sigma * Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
+    }
+    const N = 10000; const results = [];
+    for(let i=0; i<N; i++){
+      const fcf0 = Math.max(0.4, gaussian(0.672, 0.04));
+      const g1 = gaussian(0.08, 0.015);
+      const g2 = gaussian(0.05, 0.012);
+      let gT = gaussian(0.03, 0.004);
+      const wacc = Math.max(0.06, gaussian(0.08, 0.005));
+      if(gT >= wacc - 0.005) gT = wacc - 0.01;
+      const v = runDCF(fcf0, g1, g2, gT, wacc);
+      if(isFinite(v) && v > 0 && v < 1200) results.push(v);
+    }
+    results.sort((a,b)=>a-b);
+    const n = results.length;
+    const mean = results.reduce((s,x)=>s+x,0)/n;
+    const median = results[Math.floor(n*0.5)];
+    const p10 = results[Math.floor(n*0.10)];
+    const p90 = results[Math.floor(n*0.90)];
+    const std = Math.sqrt(results.reduce((s,x)=>s+(x-mean)**2,0)/n);
+    const probAbove = results.filter(x=>x>PRICE).length / n;
+
+    document.getElementById('mcMean').textContent   = '$'+mean.toFixed(0);
+    document.getElementById('mcMedian').textContent = '$'+median.toFixed(0);
+    document.getElementById('mcP10').textContent    = '$'+p10.toFixed(0);
+    document.getElementById('mcP90').textContent    = '$'+p90.toFixed(0);
+    document.getElementById('mcStd').textContent    = '$'+std.toFixed(0);
+    document.getElementById('mcProb').textContent   = (probAbove*100).toFixed(1)+'%';
+
+    const lo = Math.floor(p10/25)*25 - 25;
+    const hi = Math.ceil(p90/25)*25 + 25;
+    const bins = 28; const step = (hi-lo)/bins;
+    const counts = new Array(bins).fill(0);
+    results.forEach(v => { if(v>=lo && v<hi){ counts[Math.min(bins-1, Math.floor((v-lo)/step))]++; } });
+    const labels = counts.map((_,i)=>'$'+Math.round(lo+i*step));
+    const barColors = counts.map((_,i)=>{ const c = lo + i*step + step/2; return c >= PRICE ? 'rgba(39,194,138,0.75)' : 'rgba(17,150,219,0.7)'; });
+
+    new Chart(document.getElementById('mcChart'), {
+      type:'bar',
+      data:{labels,datasets:[{label:'Frequência',data:counts,backgroundColor:barColors,borderWidth:0,categoryPercentage:1.0,barPercentage:1.0}]},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{title:(it)=>'Valor ~'+it[0].label,label:(c)=>c.parsed.y+' simulações'}},
+          title:{display:true,text:'Distribuição do Valor Intrínseco — 10.000 simulações DCF',color:'#EAF1F6',font:{size:14,weight:'600'},padding:{bottom:16}}
+        },
+        scales:{
+          x:{grid:{display:false},ticks:{maxRotation:60,minRotation:60,autoSkip:true,maxTicksLimit:10,font:{size:9}}},
+          y:{grid:{color:'rgba(255,255,255,0.06)'},title:{display:true,text:'Nº de simulações',color:'#8FA0AE'}}
+        },
+        animation:{duration:1200,easing:'easeOutQuart'}
+      }
+    });
+  })();
+
+  // Football field
+  new Chart(document.getElementById('ffChart'), {
+    type:'bar',
+    data:{
+      labels:['DCF (FCF, 3 cenários)','Múltiplo P/E (16-22x · 2026E)','EV/EBITDA (14-18x · 2026E)','FCF Yield (5-7%)','Morningstar / consenso'],
+      datasets:[{
+        label:'Intervalo de valor justo',
+        data:[[248,543],[306,420],[325,456],[281,393],[400,460]],
+        backgroundColor:['rgba(17,150,219,0.55)','rgba(168,85,247,0.55)','rgba(255,138,0,0.55)','rgba(39,194,138,0.55)','rgba(227,24,55,0.5)'],
+        borderColor:['#1196DB','#A855F7','#FF8A00','#27C28A','#E31837'],borderWidth:2,borderSkipped:false,borderRadius:6
+      }]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:(c)=>'Intervalo: $'+c.raw[0]+' – $'+c.raw[1]}},
+        title:{display:true,text:'Football Field — intervalos de valor justo por método ($/ação)',color:'#EAF1F6',font:{size:14,weight:'600'},padding:{bottom:16}}
+      },
+      scales:{x:{min:200,max:580,grid:{color:'rgba(255,255,255,0.06)'},ticks:{callback:(v)=>'$'+v}},y:{grid:{display:false},ticks:{font:{size:11}}}},
+      animation:{duration:1400,easing:'easeOutQuart'}
+    },
+    plugins:[{
+      id:'priceLine',
+      afterDatasetsDraw(chart){
+        const {ctx, chartArea, scales} = chart;
+        const x = scales.x.getPixelForValue(PRICE);
+        ctx.save();
+        ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom);
+        ctx.lineWidth = 2; ctx.setLineDash([6,4]); ctx.strokeStyle = '#E31837'; ctx.stroke();
+        ctx.setLineDash([]); ctx.fillStyle = '#E31837'; ctx.font = '700 11px Inter, sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('Preço ~$316', x, chartArea.top - 6);
+        ctx.restore();
+      }
+    }]
+  });
+</script>
+
+</body>
+</html>
